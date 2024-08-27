@@ -1,4 +1,4 @@
-import 'package:daffa_movie_app/app/enums/original_language.enum.dart';
+import 'package:logger/logger.dart';
 
 /// `MovieItemResponse` adalah kelas model yang digunakan untuk merepresentasikan
 /// respons dari API yang berisi data film.
@@ -12,20 +12,11 @@ import 'package:daffa_movie_app/app/enums/original_language.enum.dart';
 /// MovieItemResponse response = MovieItemResponse.fromJson(jsonResponse);
 /// ```
 class MovieItemResponse {
-  // Tanggal mulai dan akhir untuk data film.
-  final Dates? dates;
-
   /// Nomor halaman saat ini.
   final int page;
 
   /// Daftar hasil film yang terkait dengan respons.
   final List<MovieResult> results;
-
-  /// Jumlah total halaman.
-  final int totalPages;
-
-  /// Jumlah total hasil film.
-  final int totalResults;
 
   /// Konstruktor untuk `MovieItemResponse`.
   ///
@@ -37,9 +28,6 @@ class MovieItemResponse {
   MovieItemResponse({
     required this.page,
     required this.results,
-    required this.totalPages,
-    required this.totalResults,
-    this.dates,
   });
 
   /// Membuat objek `MovieItemResponse` dari JSON.
@@ -47,11 +35,6 @@ class MovieItemResponse {
   /// [json] adalah peta JSON yang berisi data untuk membuat objek.
   factory MovieItemResponse.fromJson(final Map<String, dynamic> json) =>
       MovieItemResponse(
-        dates: json['dates'] != null
-            ? Dates.fromJson(
-                json['dates'] as Map<String, dynamic>,
-              )
-            : null,
         page: json['page'] as int,
         results: (json['results'] as List<dynamic>)
             .map(
@@ -59,62 +42,14 @@ class MovieItemResponse {
                   MovieResult.fromJson(i as Map<String, dynamic>),
             )
             .toList(),
-        totalPages: json['total_pages'] as int,
-        totalResults: json['total_results'] as int,
       );
 
   /// Mengubah objek `MovieItemResponse` menjadi JSON.
   ///
   /// Mengembalikan peta JSON yang berisi data objek.
   Map<String, dynamic> toJson() => <String, dynamic>{
-        'dates': dates?.toJson(),
         'page': page,
-        'results': results.map((final MovieResult i) => i.toJson()).toList(),
-        'total_pages': totalPages,
-        'total_results': totalResults,
-      };
-}
-
-/// `Dates` adalah kelas model yang digunakan untuk merepresentasikan
-/// rentang tanggal yang terkait dengan data film.
-///
-/// Kelas ini menyimpan tanggal maksimum dan minimum.
-///
-/// Contoh penggunaan:
-///
-/// ```dart
-/// Dates dates = Dates.fromJson(jsonResponse);
-/// ```
-class Dates {
-  /// Tanggal maksimum.
-  final DateTime maximum;
-
-  /// Tanggal minimum.
-  final DateTime minimum;
-
-  /// Konstruktor untuk `Dates`.
-  ///
-  /// [maximum] adalah tanggal maksimum dan bersifat wajib.
-  /// [minimum] adalah tanggal minimum dan bersifat wajib.
-  Dates({
-    required this.maximum,
-    required this.minimum,
-  });
-
-  /// Membuat objek `Dates` dari JSON.
-  ///
-  /// [json] adalah peta JSON yang berisi data untuk membuat objek.
-  factory Dates.fromJson(final Map<String, dynamic> json) => Dates(
-        maximum: DateTime.parse(json['maximum'] as String),
-        minimum: DateTime.parse(json['minimum'] as String),
-      );
-
-  /// Mengubah objek `Dates` menjadi JSON.
-  ///
-  /// Mengembalikan peta JSON yang berisi data objek.
-  Map<String, dynamic> toJson() => <String, dynamic>{
-        'maximum': maximum.toIso8601String(),
-        'minimum': minimum.toIso8601String(),
+        'results': results.map((final MovieResult? i) => i!.toJson()).toList(),
       };
 }
 
@@ -143,7 +78,7 @@ class MovieResult {
   final int id;
 
   /// Bahasa asli film.
-  final OriginalLanguageEnum originalLanguage;
+  final String originalLanguage;
 
   /// Judul asli film.
   final String originalTitle;
@@ -218,30 +153,33 @@ class MovieResult {
   /// Membuat objek `MovieResult` dari JSON.
   ///
   /// [json] adalah peta JSON yang berisi data untuk membuat objek.
-  factory MovieResult.fromJson(final Map<String, dynamic> json) => MovieResult(
-        adult: json['adult'] as bool,
-        backdropPath: json['backdrop_path'] != null
-            ? json['backdrop_path'] as String
-            : null,
-        genreIds: List<int>.from(json['genre_ids'] as List<dynamic>),
-        id: json['id'] as int,
-        originalLanguage: OriginalLanguageEnum.values.firstWhere(
-          (final OriginalLanguageEnum e) =>
-              e.value == json['original_language'],
-        ),
-        originalTitle: json['original_title'] as String,
-        overview: json['overview'] as String,
-        popularity: json['popularity'].toDouble() as double,
-        posterPath:
-            json['poster_path'] != null ? json['poster_path'] as String : null,
-        releaseDate: json['release_date'] == null || json['release_date'] == ''
-            ? null
-            : DateTime.parse(json['release_date'] as String),
-        title: json['title'] as String,
-        video: json['video'] as bool,
-        voteAverage: json['vote_average'].toDouble() as double,
-        voteCount: json['vote_count'] as int,
-      );
+  factory MovieResult.fromJson(final Map<String, dynamic> json) {
+    Logger().f(json);
+    return MovieResult(
+      adult: json['adult'] as bool,
+      backdropPath: json['backdrop_path'] != null
+          ? json['backdrop_path'] as String
+          : null,
+      genreIds: List<int>.from(json['genre_ids'] as List<dynamic>),
+      id: json['id'] as int,
+      originalLanguage: json['original_language'] as String,
+      // OriginalLanguageEnum.values.firstWhere(
+      //   (final OriginalLanguageEnum e) => e.value == json['original_language'],
+      // ),
+      originalTitle: json['original_title'] as String,
+      overview: json['overview'] as String,
+      popularity: json['popularity'].toDouble() as double,
+      posterPath:
+          json['poster_path'] != null ? json['poster_path'] as String : null,
+      releaseDate: json['release_date'] == null || json['release_date'] == ''
+          ? null
+          : DateTime.parse(json['release_date'] as String),
+      title: json['title'] as String,
+      video: json['video'] as bool,
+      voteAverage: json['vote_average'].toDouble() as double,
+      voteCount: json['vote_count'] as int,
+    );
+  }
 
   /// Mengubah objek `MovieResult` menjadi JSON.
   ///
@@ -251,7 +189,7 @@ class MovieResult {
         'backdrop_path': backdropPath,
         'genre_ids': genreIds,
         'id': id,
-        'original_language': originalLanguage.value.toString(),
+        'original_language': originalLanguage,
         'original_title': originalTitle,
         'overview': overview,
         'popularity': popularity,

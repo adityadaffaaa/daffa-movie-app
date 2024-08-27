@@ -28,7 +28,7 @@ class NowPlayingController extends GetxController {
       Get.find<WatchlistPageController>();
 
   /// Controller untuk mengelola Carousel Slider.
-  final CarouselController carouselCtrl = CarouselController();
+  final CarouselSliderController carouselCtrl = CarouselSliderController();
 
   /// Service untuk berkomunikasi dengan MovieDB API.
   final MovieDbService movieDbService = MovieDbService();
@@ -67,7 +67,6 @@ class NowPlayingController extends GetxController {
       final MovieItemResponse data = await movieDbService.getMovie(
         MovieTypeEnum.nowPlaying,
       );
-
       for (final MovieResult e in data.results) {
         final bool isSaved =
             await saveImageToLocalStorage(e.posterPath, imageId: e.id);

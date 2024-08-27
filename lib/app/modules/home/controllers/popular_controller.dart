@@ -63,9 +63,10 @@ class PopularController extends GetxController {
         if (isSaved) popularMovieItems.add(e);
       }
     } catch (e) {
-      isLoading.value = false;
       logger.e('Fetch popular movie failed: $e');
       throw OtherException('Fetch popular movie failed: $e');
+    } finally {
+      isLoading.value = false;
     }
   }
 
@@ -113,6 +114,8 @@ class PopularController extends GetxController {
       );
     } catch (e) {
       logger.e('Handle favorite and watch list movie check failed: $e');
+      throw OtherException(
+          'Handle favorite and watch list movie check failed: $e');
     } finally {
       isLoading.value = false;
     }
@@ -130,8 +133,7 @@ class PopularController extends GetxController {
 
     if (isSuccess) {
       popularMovieItems
-          .where((final MovieResult item) => item.id == id)
-          .toList()[0]
+          .firstWhere((final MovieResult item) => item.id == id)
           .isFavorite = isAdd;
       popularMovieItems.refresh();
     }
@@ -150,8 +152,7 @@ class PopularController extends GetxController {
 
     if (isSuccess) {
       popularMovieItems
-          .where((final MovieResult item) => item.id == id)
-          .toList()[0]
+          .firstWhere((final MovieResult item) => item.id == id)
           .isWatchlist = isAdd;
       popularMovieItems.refresh();
     }

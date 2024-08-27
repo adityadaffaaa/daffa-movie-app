@@ -9,7 +9,7 @@ import 'package:daffa_movie_app/utils/images.dart' as app_images;
 /// item-item promosi dalam bentuk carousel.
 class PromotionCarouselController extends GetxController {
   /// Controller untuk mengelola carousel dari paket [carousel_slider].
-  final CarouselController carouselCtrl = CarouselController();
+  final CarouselSliderController carouselCtrl = CarouselSliderController();
 
   /// Index halaman saat ini pada carousel.
   RxInt carouselIdx = RxInt(0);
